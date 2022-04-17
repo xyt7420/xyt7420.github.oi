@@ -1,0 +1,211 @@
+﻿<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Intro to MapView - Create a 2D map</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+      body{
+          position:relative;
+      }
+
+      .top{
+        box-sizing: border-box;
+        height: 50px;
+        width: 100%;
+        background-color:rgba(95, 158, 160, 0.821);
+        color: rgb(240, 252, 255);
+        padding-left: 50px;
+        box-sizing:border-box;
+      }
+      .top b{
+        line-height:45px;
+        font-size: 28px;
+      }
+      #other{
+        position: absolute;
+        z-index: 1;
+        left:69% ;
+        top: 60%;
+        height: 300px;
+      }
+      #final{
+        /*height: 350px;*/
+        position: absolute;
+        z-index: 1;
+        left: 72%;
+        top: 70px;
+      }
+      .top #searchdiv{
+        float: right;
+        box-sizing: border-box;
+        /* background-color: black;
+        height: 10px;
+        width: 10px; */
+        z-index: 1;
+        margin-top: 20px;
+        margin-right: 20px;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.23/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.23/"></script>
+    <script>
+        require([
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/layers/FeatureLayer",
+          "esri/widgets/BasemapGallery",
+          "esri/widgets/Legend",
+          "esri/widgets/LayerList",
+          "esri/widgets/ScaleBar",
+          "esri/widgets/Search",
+          "esri/widgets/Editor",
+          "esri/widgets/Print",
+          "esri/widgets/Home",
+          "esri/widgets/Compass"
+        ], (
+          Map,
+          MapView,
+          FeatureLayer,
+          BasemapGallery,
+          Legend,
+          LayerList,
+          ScaleBar,
+          Search,
+          Editor,
+          Print,
+          Home,
+          Compass
+        ) => {
+            const map = new Map({
+                basemap: "topo"
+                //layers:[featureLayer]
+            });
+        const view = new MapView({
+            container: "viewDiv",
+            map: map,
+            zoom: 4,
+            center: [105, 34] // longitude, latitude
+        });
+        let homeWidget = new Home({
+            view: view
+        });
+
+        // adds the home widget to the top left corner of the MapView
+        view.ui.add(homeWidget, "top-left");
+        const Layer = new FeatureLayer({
+            url: "https://www.geosceneonline.cn/server/rest/services/Hosted/%E5%85%A8%E5%9B%BD%E5%90%84%E7%9C%81%E5%8C%BB%E7%96%97%E5%8D%AB%E7%94%9F%E6%9C%BA%E6%9E%84%E6%95%B0/FeatureServer",
+            title: "全国各省2007~2016年度医疗卫生机构数",
+            popupTemplate: {
+                title: "全国各省2007~2016年度医疗卫生机构数",
+                lastEditInfoEnabled: false,
+                content: [
+                  {
+                      type: "fields",
+                      fieldInfos: [
+                        {
+                            fieldName: "name"
+                        },
+
+                        {
+                            fieldName: "type"
+                        }
+                      ]
+                  }
+                ]
+            }
+        });
+
+        map.add(Layer);
+        let basemapGallery = new BasemapGallery({
+            view: view
+        });
+        // Add widget to the top right corner of the view
+        view.ui.add(basemapGallery, {
+            position: "top-left"
+        });
+
+        const legend = new Legend({
+            view: view,
+            container: "final",
+            layerInfos: [
+              {
+                  layer: Layer,
+                  title: "年度医疗卫生机构数"
+              }
+            ]
+        });
+
+        // view.ui.add(legend, "bottom-right");
+
+        const layerList = new LayerList({
+            view: view
+        });
+        // Adds widget below other elements in the top left corner of the view
+        view.ui.add(layerList, {
+            position: "top-right"
+        });
+        var scaleBar = new ScaleBar({
+            view: view,
+            style: "ruler"
+        });
+        // Add widget to the bottom left corner of the view
+        view.ui.add(scaleBar, {
+            position: "bottom-left"
+        });
+        const searchWidget = new Search({
+            view: view,
+            container: "searchdiv"
+        });
+        // Adds the search widget below other elements in
+        // the top left corner of the view
+        // view.ui.add(searchWidget, {
+        //   position: "top-left",
+        //   index: 2
+        // });
+        // At the very minimum, set the Editor's view
+        // const editor = new Editor({
+        //   view: view
+        // });
+
+        // view.ui.add(editor, "top-right");
+        const print = new Print({
+            view: view,
+            container: "other",
+            // specify your own print service
+            printServiceUrl:
+              "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        });
+        const compass = new Compass({
+            view: view
+        });
+
+        // adds the compass to the top left corner of the MapView
+        view.ui.add(compass, "top-right");
+        });
+    </script>
+  </head>
+  <body>
+    <div id="basemapGalleryDiv"></div>
+    <div class="top">
+      <b>全国各省2007~2016年度医疗卫生机构数</b>
+      <div id="searchdiv"></div>
+    </div>
+    <div id="viewDiv"></div>
+    <div id="other"></div>
+    <div id="final"></div>
+  </body>
+</html>
